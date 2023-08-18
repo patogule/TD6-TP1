@@ -28,7 +28,7 @@ print(imagen_redimensionada)
 
 Quisimos hacer este codigo para que el jpg se pueda ver en pantalla a medida que les contamos sobre nuestras observaciones y es mas facil seguir lo que decimos.
 
-En este experimento probamos con distintos valores de proporcion de NA, a cada uno de nuestros datasets. Haremos observaciones entre distintos datasets como tambien entre distintas etapas de un mismo dataset. Comenzemos con las observaciones:
+En este experimento probamos con distintos valores de proporcion de NA, en cada uno de nuestros datasets. Hicimos observaciones entre distintos datasets como tambien entre distintas etapas de un mismo dataset. Comencemos con las observaciones:
 
 - En primer lugar, podemos ver un patron muy claro en donde los datasets llegan a sus picos de performance en profundidades mas chicas (con prop_NA=0.1, llegan al pico con max_depth=4/5), y luego a profundidades mas grandes el AUC comienza a reducir. En particular, el dataset de Heart y el de Wine tienden a llegar a un pico y luego bajar su performance de manera empinada. Esto puede ser causado por particulares de estos dos datasets, o tambien por overfitting. Esto significa que el arbol esta captando mucho detalle; al ser tan profundo es muy especifico y cuando lo llevo a datos desconocidos no performa bien.
 
