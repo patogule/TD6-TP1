@@ -18,11 +18,11 @@ Obtuvimos los datos de la siguiente pagina: https://archive.ics.uci.edu/dataset/
   
 3) Explique qué es lo que se intentará predecir.
 
-Lo que intentaremos predecir a partir de nuestras variables predictoras es si la calidad del vino es buena, donde el valor 1 representa que un vino es de buena calidad, y 0 si no lo es. Esta prediccion no es trivial debido a que las variables que se usan para predecir no solo son dificiles de interpretar individualmetne, sino que ademas las distintas variables pueden interactuar de manera compleja entre si.
+Lo que intentaremos predecir a partir de nuestras variables predictoras es si la calidad del vino es buena, donde el valor 1 representa que un vino es de buena calidad, y 0 si no lo es. Esta predicción no es trivial debido a que las variables que se usan para predecir no solo son dificiles de interpretar individualmente, sino que ademas las distintas variables pueden interactuar de manera compleja entre si.
 
 4) Haga todas las transformaciones a los datos requeridas.
 
-Como la variable a predecir del dataset descargado no era de clasificacion binaria, tuvimos que modificar nuestro dataset. El dataset contenia una columna llamada 'quality' en donde se representaba la calidad del vino con un numero entre 1 (de peor calidad) y 10 (de mejor calidad). Por lo tanto, decidimos adaptar esta variable predictora a una que se ajuste a nuestro problema. Para ello, calculamos la mediana, el promedio, e hicimos un histograma entre todos los valores de 'quality' de nuestras 4898 instancias, para poder visualizar la cantidad de apariciones de cada valor y decidir el punto de corte entre un vino de buena calidad y uno de mala calidad, intentando repartir de manera equitativa los datos. 
+Como la variable a predecir del dataset descargado no era de clasificación binaria, tuvimos que modificar nuestro dataset. El dataset contenía una columna llamada 'quality' en donde se representaba la calidad del vino con un numero entre 1 (vino de peor calidad) y 10 (vino de mejor calidad). Por lo tanto, decidimos adaptar esta variable predictora a una que se ajuste a nuestro problema de clasificación binaria. Para ello, calculamos la mediana, el promedio, e hicimos un histograma entre todos los valores de 'quality' de nuestras 4898 instancias, para poder visualizar la cantidad de apariciones de cada valor y decidir el punto de corte entre un vino de buena calidad y uno de mala calidad, intentando repartir de manera equitativa los datos. 
 
 ```{r}
 datos <- read.csv("./data/winequality-white.csv", sep = ';')
@@ -39,10 +39,10 @@ hist(datos$quality)
 
 ```
 
-A partir de estos resultados, consideramos que el valor 6 es un buen punto de corte para nuestra clasificacion binaria. 
+A partir de estos resultados, consideramos que el valor 6 es un buen punto de corte para nuestra clasificación binaria. 
 
 
-Nuestro proximo paso fue utilizar la informacion que adquirimos con los calculos previos para modificar nuestra variable a predecir, valiendo 1 en caso de que 'quality' sea mayor a 6, y 0 en caso contrario.
+Nuestro próximo paso fue utilizar la información que adquirimos con los calculos previos para modificar nuestra variable a predecir, valiendo 1 en caso de que 'quality' sea mayor a 6, y 0 en caso contrario.
 
 ```{r}
 
@@ -70,7 +70,7 @@ Podemos ver como los valores mayores o iguales a 6 fueron reemplazados por un 1,
 
 5) Guarde el archivo a analizar en formato CSV tradicional (texto plano delimitado por comas, en donde la primera fila debe contener los nombres de las variables).
 
-Nuestro dataset no vino en formato tradicional ya que el separador usado era ';'. De todas maneras, al modificar la columna como hicimos en el ultimo codigo, aprovechamos para escribir el nuevo csv con separador ','. Luego de eso, el dataset quedo en formato tradicional.
+Nuestro dataset no vino en formato tradicional ya que el separador usado era ';'. De todas maneras, al modificar la columna como hicimos en el ultimo código, aprovechamos para escribir el nuevo csv con separador ','. Luego de eso, el dataset quedo en formato tradicional.
 
 ```{r}
 
