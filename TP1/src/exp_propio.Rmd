@@ -1,0 +1,25 @@
+---
+title: "exp_propio"
+author: "Patricio Guledjian, Azul Noguera, Rocio Gonzalez"
+date: "2023-08-17"
+output: html_document
+---
+
+```{r}
+source("exp_propio.R")
+```
+
+
+
+```{r}
+datos <- read.csv("./data/winequality_modificados.csv", sep = ',')
+
+modelo <- glm(quality ~ fixed.acidity + volatile.acidity + citric.acid + residual.sugar + chlorides + free.sulfur.dioxide +       total.sulfur.dioxide + density + pH + sulphates + alcohol, data = datos)
+
+summary(modelo)
+
+```
+```{r}
+corr()
+```
+
