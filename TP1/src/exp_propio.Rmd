@@ -20,6 +20,13 @@ summary(modelo)
 
 ```
 ```{r}
-corr()
+library(rpart)
+
+data_df <- datos
+
+tree <- rpart(quality ~ ., data=data_df, control=rpart.control(minsplit=2, minbucket=1, maxdepth=10, cp=0, xval=0))
+
+tree$variable.importance
+
 ```
 
