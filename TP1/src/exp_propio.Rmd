@@ -76,9 +76,30 @@ ruta_archivo_nuevo <- "./data/heart_top.csv"
 write.csv(heart_top, file=ruta_archivo_nuevo, sep = ',', row.names=FALSE)
 ```
 
+```{r}
 
+library(magick)
 
+# Ruta de la imagen JPG
+ruta_imagen <- "./outputs/plots/exp_propio.jpg"
 
+# Cargar y mostrar la imagen
+imagen <- image_read(ruta_imagen)
+# Redimensionar la imagen para ajustarla al tamaño de la consola
+imagen_redimensionada <- image_scale(imagen, "475x500")
+
+# Mostrar la imagen redimensionada en la consola
+print(imagen_redimensionada)
+
+```
+
+Lo que propusimos en nuestro experimento fue seleccionar las variables mas importantes a la hora de crear el modelo, y de esa forma analizar como se compara su performance al modelo original. Llevamos a cabo la obtencion de las variables mas importantes con rpart, y luego tuvimos que elegir una estrategia para decidir que variables formaran parte del nuevo dataset. Para eso, calculamos la media entre todas las importancias de las variables del dataset original, y a partir de este valor nos quedamos con todas aquellas variables cuya importancia era mayor al promedio. Asi, cada uno de los datasets original termino siendo reducido a un total de 6 variables predictoras.
+
+Hicimos este experimento para analizar si al tener mas variables predictoras, la performance siempre sera mayor, o si todo depende de la importancia de cada una de ellas y las particularidades de los datasets. Calculamos la performance de los 3 datasets originales, y de los 3 datasets con las 6 variables predictoras.
+
+Comencemos con las observaciones:
+
+- En primer lugar, podemos ver que las performances de los datasets originales vs datasets reducidos son en general muy parecidos, con una performance casi identica. Si decidimos ponernos mas especificos, a mas profundidad del arbol, los datasets originales tienden a tener apenas mas de performance que los 
 
 
 
