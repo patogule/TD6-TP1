@@ -54,8 +54,10 @@ run_experiment <- function(datasets_to_pred, filepath) {
                                                   val_reps=30)
         }
         
-        
-    
+        exp_results[[i]] <- res_tmp
+        rm(res_tmp)  # Clean up temporary result
+        i <- i + 1  # Increment result counter
+  
   }
   
   # Combine experiment results into a single data frame

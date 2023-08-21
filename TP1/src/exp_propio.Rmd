@@ -76,7 +76,22 @@ ruta_archivo_nuevo <- "./data/heart_top.csv"
 write.csv(heart_top, file=ruta_archivo_nuevo, sep = ',', row.names=FALSE)
 ```
 
+```{r}
 
+library(magick)
+
+# Ruta de la imagen JPG
+ruta_imagen <- "./outputs/plots/exp_propio.jpg"
+
+# Cargar y mostrar la imagen
+imagen <- image_read(ruta_imagen)
+# Redimensionar la imagen para ajustarla al tamaño de la consola
+imagen_redimensionada <- image_scale(imagen, "475x500")
+
+# Mostrar la imagen redimensionada en la consola
+print(imagen_redimensionada)
+
+```
 
 
 
