@@ -47,7 +47,14 @@ Nuestro objetivo consistirá en predecir, a partir de las variables predictoras,
 
 Dado que la variable objetivo del conjunto de datos que descargamos no presentaba una estructura de clasificación binaria, fue necesario llevar a cabo una adaptación en nuestra base de datos. En el conjunto de datos original, se encontraba una columna denominada 'quality', la cual reflejaba la calidad del vino mediante un valor numérico que oscilaba entre 1 (representando el vino de menor calidad) y 10 (indicando el vino de mayor calidad). Ante esta situación, se optó por ajustar esta variable predictora para adecuarla a nuestra problemática de clasificación binaria.
 
-Este proceso implicó calcular tanto la mediana como el promedio de los valores presentes en la columna 'quality' de las 4898 instancias de nuestro conjunto de datos. Además, se procedió a elaborar un histograma para visualizar la frecuencia de aparición de cada valor en 'quality'. Esta visualización permitió establecer un umbral de corte que demarcara la distinción entre un vino de calidad superior y otro de calidad inferior. La selección de este punto de corte fue llevada a cabo con el objetivo de lograr una distribución equitativa de los datos en ambas categorías de calidad.
+La conversión de una variable numérica a una forma binaria implica encontrar un punto de corte que divida los valores en dos categorías claramente definidas. Para determinar el punto de corte más adecuado, se requiere un análisis exhaustivo de diversas características de los datos. Esto incluye la consideración de la distribución de los valores, la detección de valores atípicos y la comprensión de la dispersión de los datos, entre otros factores.
+
+En este sentido, implementaremos un análisis cuantitativo que involucra el cálculo de la media y la mediana de los valores presentes en la columna $Quality$ de las 4898 instancias de nuestro conjunto de datos. Estos valores centrales pueden ser puntos de referencia para ubicar el punto de corte, ya sea en uno de ellos o en una posición intermedia entre los cuartiles.
+
+Además, procederemos con la elaboración de un histograma que permitirá examinar la distribución de los valores numéricos en $Quality$. Este enfoque busca identificar regiones en las que los valores tiendan a agruparse en dos grupos diferenciados. Si encontramos una separación clara en estos grupos, ese punto podría ser considerado como un posible candidato para el umbral.
+
+La utilización de un boxplot, también conocido como diagrama de caja, será una herramienta valiosa para identificar valores atípicos y la variabilidad de los datos. En particular, pondremos especial atención en buscar indicios de una división entre los valores inferiores y superiores. No es improbable que el valor que se ubica en el extremo superior de la "caja" pueda ser evaluado como una opción viable para el punto de corte.
+
 
 #### Mediana
 La mediana de la calidad del vino es:
@@ -55,7 +62,6 @@ La mediana de la calidad del vino es:
 datos <- read.csv("./data/winequality-white.csv", sep = ';')
 
 median(datos$quality)
-
 ```
 
 #### Promedio
@@ -66,27 +72,47 @@ mean(datos$quality)
 ```
 
 #### Histograma 
-Examinemos los datos a través de un histograma.
+Examinemos la distribución de los datos a través de un histograma.
 
 ```{r, echo = FALSE}
 
-hist(datos$quality, main = "Distribución de la Calidad del Vino", xlab = "Calidad", ylab = "Frecuencia", col = "lightblue")
+hist(datos$quality, main = "Distribución de la Calidad del Vino", xlab = "Calidad", ylab = "Frecuencia", col = "lightblue", breaks = seq(0.5, 10.5, by = 1), axes = TRUE, xaxt = "n")
+axis(1, at = 1:10, labels = 1:10)
 
+fig.pos = "H"
 
 ```
 
-Basándonos en estos resultados, hemos llegado a la conclusión de que el valor 6 es un umbral adecuado para llevar a cabo nuestra clasificación binaria.
+#### BoxPlot
+Analizaremos la variabilidad de los datos a través de un diagrama de caja.
+
+```{r, echo = FALSE}
+
+boxplot(datos$quality, main = "Distribución de la Calidad del Vino", ylab = "Calidad", col = "lightblue")
+fig.pos = "H"
+
+```
+
+
+Debido a que los datos exhiben una distribución continua y no muestran una segregación evidente en grupos distintos a través del histograma o el boxplot, hemos optado por determinar el umbral adecuado para la transformación de la variable numérica en una variable binaria basándonos en el cálculo del promedio y la mediana. Esta elección nos pareció acertada debido a que estas medidas centrales proporcionan una representación equilibrada de la distribución de los datos.
+
+Seleccionar el promedio y la mediana como puntos de corte nos brinda ciertas ventajas. El promedio ofrece una evaluación de la tendencia central de los datos, mientras que la mediana proporciona una división en la mitad de la distribución. La combinación de ambas perspectivas nos permite obtener una comprensión más completa de la ubicación y la dispersión de los valores.
+
+Basándonos en estos resultados, hemos llegado a la conclusión de que el valor 6 es un umbral adecuado para llevar a cabo nuestra clasificación binaria. Esta división demarcara la distinción entre un vino de calidad superior y otro de calidad inferior. La selección de este punto de corte fue llevada a cabo con el objetivo de lograr una distribución equitativa de los datos en ambas categorías de calidad.
 
 En la siguiente etapa, empleamos los conocimientos obtenidos a partir de los cálculos anteriores para transformar nuestra variable objetivo. Esta variable tomará el valor 1 si 'quality' es mayor a 6, y el valor 0 en caso contrario.
 
-```{r}
 
-# Cargar el archivo CSV en un DataFrame
-datos <- read.csv("./data/winequality-white.csv", sep = ';')
 
+### Código de modificación
+Los valores de $Quality$ solian presentarse de esta forma:
+
+```{r, echo = FALSE}
 head(datos$quality, n = 20)
+```
 
-# Recorrer la columna y modificar los valores
+```{r}
+# Recorremos la columna Quality y modificar los valores
 for (i in 1:length(datos$quality)) {
   if (datos$quality[i] >= 6) {
     datos$quality[i] <- 1
@@ -94,21 +120,24 @@ for (i in 1:length(datos$quality)) {
     datos$quality[i] <- 0
   }
 }
+suppressWarnings({
+  ruta_archivo_nuevo <- "./data/winequality_modificados.csv"
+  write.csv(datos, file=ruta_archivo_nuevo, sep = ',', row.names=FALSE)
+})
 
-ruta_archivo_nuevo <- "./data/winequality_modificados.csv"
-write.csv(datos, file=ruta_archivo_nuevo, sep = ',', row.names=FALSE)
+```
 
+Con la siguiente modificación podemos ver como los valores mayores o iguales a 6 fueron reemplazados por un 1, y los valores menores a 6 por un 0.
+
+```{r, echo = FALSE}
 head(datos$quality, n = 20)
 ```
 
-Podemos ver como los valores mayores o iguales a 6 fueron reemplazados por un 1, y los valores menores a 6 por un 0.
-
-5)  Guarde el archivo a analizar en formato CSV tradicional (texto plano delimitado por comas, en donde la primera fila debe contener los nombres de las variables).
 
 Nuestro dataset no vino en formato tradicional ya que el separador usado era ';'. De todas maneras, al modificar la columna como hicimos en el ultimo código, aprovechamos para escribir el nuevo csv con separador ','. Luego de eso, el dataset quedo en formato tradicional.
 
-```{r}
+A continuación, presentamos una vista previa inicial del conjunto de datos mediante la visualización de las primeras filas:
 
+```{r, echo=FALSE}
 head(datos, n = 10)
-
 ```
