@@ -1,46 +1,72 @@
 ---
-title: "exp_1"
-author: "Patricio Guledjian, Azul Noguera, Rocio Gonzalez"
+title: "Experimento 1"
+author: 
+    - "Patricio Guledjuan"
+    - "Azul Noguera"
+    - "Rocio Gonzalez"
 date: "`r Sys.Date()`"
-output: html_document
+output: pdf_document
 ---
 
 ```{r}
 source("exp_1.R")
 ```
 
-```{r}
 
-library(magick)
+## Experimento
 
-# Ruta de la imagen JPG
-ruta_imagen <- "./outputs/plots/exp_1.jpg"
+El presente experimento se enfoca en analizar el impacto de distintas decisiones de modelado en el rendimiento de los modelos, el cual se estima mediante la técnica de repeated validation set.
 
-# Cargar y mostrar la imagen
-imagen <- image_read(ruta_imagen)
-# Redimensionar la imagen para ajustarla al tamaño de la consola
-imagen_redimensionada <- image_scale(imagen, "475x500")
+Para llevar a cabo este experimento, se ha reproducido el proceso realizado en el experimento de ejemplo, con algunas modificaciones:
 
-# Mostrar la imagen redimensionada en la consola
-print(imagen_redimensionada)
+En lugar de probar únicamente valores de `prop_NAs` iguales a 0 y 0.7, se han considerado valores en el rango de 0.1 a 0.9, en intervalos de 0.2. Además de examinar los dos conjuntos de datos proporcionados, se ha incorporado en el análisis el conjunto de datos denominado $Wine Quality$, que fue elegido y preparado en la sección 1 de este trabajo práctico.
 
-```
-Hicimos este código para que la tabla con los experimentos se pueda ver en pantalla a medida que les contamos sobre nuestras observaciones y así resulte más fácil seguir lo que decimos.
 
-En este experimento probamos con distintos valores de proporción de NA, en cada uno de nuestros datasets. Hicimos observaciones entre distintos datasets como tambien entre distintas etapas de un mismo dataset. Comencemos con las observaciones:
+## Resultados
 
-- En primer lugar, podemos ver un patrón muy claro en donde los datasets llegan a sus picos de performance en profundidades más chicas (con prop_NA=0.1, llegan al pico con max_depth=4/5), y luego con profundidades más grandes el AUC comienza a reducir. En particular, el dataset de Heart y el de Wine tienden a llegar a un pico y luego bajar su performance de manera empinada. Esto puede ser causado por particulares de estos dos datasets, o tambien por overfitting. Esto significa que el árbol esta captando mucho detalle; al ser tan profundo es muy específico y cuando lo llevo a datos desconocidos no performa bien.
+En el contexto de este experimento, hemos llevado a cabo pruebas utilizando diversas proporciones de valores faltantes (NA) en cada uno de nuestros conjuntos de datos. Durante este proceso, hemos realizado observaciones tanto entre diferentes conjuntos de datos como entre diversas etapas dentro de un mismo conjunto de datos.
 
-- Otra observación general, que puede ser obvia pero no está de más aclarar, es que los picos de performance de prop_NAs tienen, en este caso, la relación donde el pico de un prop_NA menor es mayor al pico de un prop_NA mayor. Tiene sentido ya que, a mayor cantidad de NAs, es más difícil para el árbol conseguir una performance alta. Por lo tanto, el 20% más de datos que tienen los prop_NA más chicos que sus siguientes, ayudan a que el árbol consiga una mayor performance.
+En una primera observación, es evidente que a medida que la proporción de valores faltantes incrementa, la eficacia del modelo disminuye. Es importante destacar, además, que esta reducción del área bajo la curva se vuelve más pronunciada de manera acelerada cuando la proporción de valores faltantes supera la mitad de los datos (prop_NAs >= 0.5). Esta tendencia podría ser atribuida a que a medida que la cantidad de valores faltantes aumenta significativamente, la disponibilidad de información precisa para el proceso de modelado se ve drásticamente comprometida.
 
-- Una característica que varia entre los distintos datasets es la distancia que cada uno tiene entre las dos líneas. La roja significa que r-part usa su propia estrategia para imputar a los datos faltantes, y la azul significa que le imputamos la media/moda, dependiendo la variable, a los datos faltantes. Vemos que cada dataset parecería estar un caso distinto, ya que en uno la línea roja siempre es superior a la azul, en otro caso son muy parecidas, y en el último la azul es superior.
 
-Veamos uno por uno:
-    . Churn: En el caso del dataset de customer_churn, se visualiza que la línea roja supera a la azul en la mayoría        de los casos. Esto significa que la media/moda que imputamos en los datos faltantes no está resultando en lo           mejor, y puede ser consecuencia, por ejemplo, de outliers. Estos valores extremos afectan en general a la media.
-    . Heart: En el caso del dataset de heart, observamos un caso intermedio, donde las líneas se mantienen muy            parecidas, con distintos momentos en los que una supera a la otra. Estos comportamientos pueden estar atribuidos a la particularidad de los datos.
-    . Wine: Finalmente, el caso del dataset de winequality, podemos ver un comportamiento distinto a lo que pasaba con       los otros datasets, ya que la línea azul a medida que aumenta el prop_NA, comienza a tener mejores perfomances que la línea roja. Esto ocurre porque es un dataset que no contiene muchos outliers, y por lo tanto, la media imputada en los datos faltantes, es muy buena. Entonces, que hayan muchos datos faltantes le afecta más a r-part y su estrategia propia que a nosotros que hacemos uso de la media y en general nunca nos alejamos mucho de la media real.
 
-- Otras particularidades y diferencias entre los datasets son sus valores. Al principio con 1 de profundidad, en su pico de performance, y al final con 30 de profundidad. En el caso de profundidad 1, el que mayor valor tiene es el arbol del dataset Heart con un AUC de 0.8, cuando Wine y Churn tienen 0.6 y 0.65 respectivamente. Esto es una particularidad del dataset, como tambien que en Churn se alcanza el pico mas alto, con 0.9. Finalmente, con un prop_NA de 0.9, todos los datasets tienen performance muy bajas y tiene sentido porque se les sacó el 90% de los datos. 
+
+Continuando el análisis, se identifica un patrón notable en el que los conjuntos de datos logran su máximo rendimiento a profundidades menores. Sin embargo, a medida que las profundidades aumentan, el valor del AUC comienza a decrecer hasta lograr converger en un punto. 
+En específico, los conjuntos de datos que presentan proporciones de valores faltantes igual o menor al 0.5 exhiben una dinámica distintiva, caracterizada por alcanzar un rendimiento óptimo y luego experimentar una caída abrupta en su desempeño. Este fenómeno puede derivar de particularidades inherentes a dichos conjuntos de datos o, posiblemente, indicar la presencia de problemas de subajuste (underfitting) y sobreajuste (overfitting).
+
+En el caso del subajuste, un árbol con profundidad reducida presenta un nivel limitado de detalles, lo que conlleva a un modelado muy general y poco específico. Por otro lado, el sobreajuste se observa cuando un árbol con mucha profundidad captura un nivel excesivo de detalles, volviéndose extremadamente específico. Ambos escenarios resultan en un bajo rendimiento al aplicar el modelo a datos desconocidos. En este contexto, la profundidad intermedia entre ambos extremos contribuye a mejorar el rendimiento y es lo que origina la formación del "pico" en el rendimiento del modelo.
+
+En contraste, en los conjuntos de datos con proporciones de valores faltantes superiores al 0.5, la identificación de un "pico" de rendimiento comienza a oscurecerse. Este fenómeno podría estar relacionado con la magnitud de valores faltantes, donde la cantidad tan considerable de datos no disponibles dificulta la capacidad del árbol para realizar predicciones precisas.
+
+Vale la pena dedicar atención al escenario en que prop_NAs = 0.9. Se observa que aquí se presenta un comportamiento singular, siendo el único caso en el cual un aumento en la profundidad se asocia con un mejor rendimiento. Aunque no encontramos una hipótesis concluyente que explique este patrón, pudimos identificar que al ajustar el árbol con una profundidad considerable, se obtiene un rendimiento superior al maximizar la adaptación del modelo a los escasos datos disponibles.
+
+
+
+
+
+Una característica que varía entre los diferentes conjuntos de datos es la separación entre las dos líneas trazadas. La línea roja indica el enfoque propio de rpart para imputar los valores faltantes, mientras que la línea azul representa la imputación de la media o moda, dependiendo de la variable, en los datos faltantes. Se observa que cada conjunto de datos parece exhibir un comportamiento distinto en este sentido. En algunos casos, la línea roja es consistentemente superior a la azul, en otros casos las dos líneas son bastante similares y, en un tercer caso, la línea azul supera a la roja.
+
+
+
+Examinemos cada conjunto de datos de manera individual:
+
+- **Churn**: En el caso del dataset de "customer_churn", se observa que en la mayoría de los escenarios, la línea roja supera a la azul. Este patrón sugiere que la imputación mediante la media o moda no está generando los resultados óptimos, posiblemente debido a la presencia de valores atípicos. Estos valores extremos tienden a influir negativamente en la estimación de la media.
+
+- **Heart**: En el dataset "heart", se registra un escenario intermedio, en el cual las líneas roja y azul se mantienen muy próximas entre sí, presentando momentos en los que una supera a la otra. Estos comportamientos podrían estar relacionados con particularidades intrínsecas de los datos que interactúan con las estrategias de imputación.
+
+- **Wine**: Por último, en el conjunto de datos "winequality", se destaca un patrón diferente en comparación con los otros conjuntos. Aquí, a medida que aumenta la proporción de valores faltantes, la línea azul comienza a superar a la roja en términos de rendimiento. Este fenómeno se debe a que este conjunto presenta menos valores atípicos y, por lo tanto, la imputación basada en la media resulta efectiva. La estrategia de r-part, por su parte, se ve más afectada por la alta proporción de valores faltantes debido a su enfoque específico, mientras que nuestra estrategia de imputación basada en la media tiende a mantenerse más cerca de la media real de los datos.
+
+En conjunto, estas observaciones refuerzan la importancia de adaptar las estrategias de imputación según las particularidades de cada conjunto de datos. La elección de la estrategia de imputación puede tener un impacto significativo en el rendimiento del modelo, y estos análisis nos guían hacia decisiones informadas para lograr los mejores resultados posibles.
+
+
+![Resultados prop_NAs 0.1, 0.3, 0.5, 0.7, 0.9](./outputs/plots/exp_1.jpg)
+
+
+
+
+
+
+
 
 
 
