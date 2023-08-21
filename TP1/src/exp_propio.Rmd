@@ -12,11 +12,98 @@ source("exp_propio.R")
 ```{r}
 library(rpart)
 
-data_df <- datos
+#Buscamos las variables mas importantes de el dataset Wine.
+datos_wine <- read.csv("./data/winequality_modificados.csv")
+data_df_wine <- datos_wine
 
-tree <- rpart(quality ~ ., data=data_df, control=rpart.control(minsplit=2, minbucket=1, maxdepth=10, cp=0, xval=0))
+tree_wine <- rpart(quality ~ ., data=data_df_wine, control=rpart.control(minsplit=2, minbucket=1, maxdepth=10, cp=0, xval=0))
 
-tree$variable.importance
+variable_importance_wine <- tree_wine$variable.importance
+tree_wine$variable.importance
+mean(variable_importance_wine)
+################################################################################
 
+#Buscamos las variables mas importantes de el dataset Churn
+datos_churn <- read.csv("./data/customer_churn.csv")
+data_df_churn <- datos_churn
+
+tree_churn <- rpart(churn ~ ., data=data_df_churn, control=rpart.control(minsplit=2, minbucket=1, maxdepth=10, cp=0, xval=0))
+
+variable_importance_churn <- tree_churn$variable.importance
+tree_churn$variable.importance
+mean(variable_importance_churn)
+################################################################################
+
+#Buscamos las variables mas importantes de el dataset Heart
+datos_heart <- read.csv("./data/heart.csv")
+data_df_heart <- datos_heart
+
+tree_heart <- rpart(HeartDisease ~ ., data=data_df_heart, control=rpart.control(minsplit=2, minbucket=1, maxdepth=10, cp=0, xval=0))
+
+variable_importance_heart <- tree_heart$variable.importance
+tree_heart$variable.importance
+mean(variable_importance_heart)
+################################################################################
 ```
+
+```{r}
+#Decidimos cuantas variables darle a cada nuevo dataset. Para eso, nos quedamos con todas las variables que superen en importancia al promedio.
+
+num_top_variables_wine <- 6
+num_top_variables_churn <- 6
+num_top_variables_heart <- 6
+
+top_variables_wine <- names(sort(variable_importance_wine, decreasing = TRUE)[1:num_top_variables_wine])
+top_variables_churn <- names(sort(variable_importance_churn, decreasing = TRUE)[1:num_top_variables_churn])
+top_variables_heart <- names(sort(variable_importance_heart, decreasing = TRUE)[1:num_top_variables_heart])
+
+# Crear un nuevo conjunto de datos de entrenamiento con las variables más importantes y la variable objetivo
+winequality_top <- datos[, c(top_variables_wine, "quality")]
+customer_churn_top <- datos_churn[, c(top_variables_churn, "churn")]
+heart_top <- datos_heart[, c(top_variables_heart, "HeartDisease")]
+```
+
+```{r}
+#Cargamos los 3 nuevos datasets en la carpeta 'data'.
+
+ruta_archivo_nuevo <- "./data/winequality_top.csv"
+write.csv(winequality_top, file=ruta_archivo_nuevo, sep = ',', row.names=FALSE)
+
+ruta_archivo_nuevo <- "./data/customer_churn_top.csv"
+write.csv(customer_churn_top, file=ruta_archivo_nuevo, sep = ',', row.names=FALSE)
+
+ruta_archivo_nuevo <- "./data/heart_top.csv"
+write.csv(heart_top, file=ruta_archivo_nuevo, sep = ',', row.names=FALSE)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
