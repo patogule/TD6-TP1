@@ -1,48 +1,83 @@
 ---
-title: "Ejercicio_1"
-author: "Patricio Guledjian, Azul Noguera, Rocio Gonzalez"
+title: "Ejercicio 1"
+author: 
+    - "Patricio Guledjuan"
+    - "Azul Noguera"
+    - "Rocio Gonzalez"
 date: "`r Sys.Date()`"
-output: html_document
+output: pdf_document
 ---
 
-1) Indique precisamente de dónde se obtuvieron los datos.
+## Datos Obtenidos
 
-Obtuvimos los datos de la siguiente pagina: https://archive.ics.uci.edu/dataset/186/wine+quality y utilizamos el csv de vinos blancos.
+Trabajaremos con una variedad de conjuntos de datos que desempeñarán un papel fundamental en nuestra experimentación. Estos conjuntos de datos incluyen los de $Churn$ y $Heart$, proporcionados según las instrucciones, así como un nuevo conjunto de datos adquirido de la plataforma UC Irvine. Esta plataforma aloja 643 conjuntos de datos como parte de su servicio a la comunidad de aprendizaje automático.
+ 
+## Caracteristicas de los Datasets
+### Churn 
+Este conjunto de datos se recopiló al azar de la base de datos de una empresa de telecomunicaciones iraní durante 12 meses. Contiene información de 3150 clientes en 13 columnas, incluyendo detalles como fallas en llamadas, frecuencia de SMS, quejas, duración de suscripción, entre otros. Los atributos son principalmente datos agregados de los primeros 9 meses, mientras que las etiquetas de abandono representan el estado de los clientes al final de los 12 meses, con un período de planificación de tres meses. La taza de abandono $Churn$ será la variable a predecir. 
 
-2) Presente las características principales del conjunto de datos (e.g., cantidad de observaciones, cantidad de variables, tipo de variables, presencia de valores faltantes).
-  
-  - Cantidad de observaciones: 4898
-  - Cantidad de variables: 12
-  - Tipo de variables: Numericas
-  - Presencia de valores faltantes: No
-  
-3) Explique qué es lo que se intentará predecir.
+El enlace siguiente les dará acceso al conjunto de datos:
 
-Lo que intentaremos predecir a partir de nuestras variables predictoras es si la calidad del vino es buena, donde el valor 1 representa que un vino es de buena calidad, y 0 si no lo es. Esta predicción no es trivial debido a que las variables que se usan para predecir no solo son dificiles de interpretar individualmente, sino que ademas las distintas variables pueden interactuar de manera compleja entre si.
+Enlace: <https://archive.ics.uci.edu/dataset/563/iranian+churn+dataset>
 
-4) Haga todas las transformaciones a los datos requeridas.
+### Heart
+El conjunto de datos $Hearts$ almacena información relacionada con pacientes y su estado en términos de Enfermedades Cardiacas. Las investigaciones realizadas con la base de datos de Cleveland se han centrado en la tarea de distinguir entre la presencia y la ausencia de enfermedades cardíacas. Por lo tanto, la variable objetivo que se busca predecir es "HeartDisease", la cual indica si el paciente presenta o no una enfermedad del corazón.
 
-Como la variable a predecir del dataset descargado no era de clasificación binaria, tuvimos que modificar nuestro dataset. El dataset contenía una columna llamada 'quality' en donde se representaba la calidad del vino con un numero entre 1 (vino de peor calidad) y 10 (vino de mejor calidad). Por lo tanto, decidimos adaptar esta variable predictora a una que se ajuste a nuestro problema de clasificación binaria. Para ello, calculamos la mediana, el promedio, e hicimos un histograma entre todos los valores de 'quality' de nuestras 4898 instancias, para poder visualizar la cantidad de apariciones de cada valor y decidir el punto de corte entre un vino de buena calidad y uno de mala calidad, intentando repartir de manera equitativa los datos. 
+El enlace siguiente les dará acceso al conjunto de datos:
 
-```{r}
+Enlace: <https://archive.ics.uci.edu/ml/datasets/Heart+Disease>
+
+### Wine Quality
+
+El conjunto de datos que estamos considerando está vinculado a la variante blanca del vino portugués "Vinho Verde". En aras de abordar asuntos de privacidad y facilitar aspectos logísticos, hemos optado por hacer disponibles exclusivamente las variables de naturaleza fisicoquímica (entradas) y sensorial (salida).
+
+Resulta esencial enfocarnos en ciertos aspectos clave del conjunto de datos en cuestión:
+
+En primer lugar, contamos con un total de 4898 observaciones. Dentro de estas observaciones, se han registrado 12 variables que desempeñan distintos roles en el análisis. Es relevante notar que todas estas variables son de tipo numérico, lo que ofrece una base sólida para un análisis cuantitativo. Adicionalmente, es importante destacar que no se ha identificado la presencia de valores faltantes en el conjunto de datos, lo cual fortalece su integridad y confiabilidad.
+
+El enlace siguiente les dará acceso al conjunto de datos específico que hemos seleccionado para este proyecto:
+
+Enlace: <https://archive.ics.uci.edu/dataset/186/wine+quality>
+
+## Predicción
+
+Nuestro objetivo consistirá en predecir, a partir de las variables predictoras, la calidad del vino. En este contexto, un valor de 1 indicará que el vino posee una calidad favorable, mientras que un valor de 0 indicará lo contrario. Esta tarea de predicción no es de naturaleza trivial debido a que las variables empleadas para este propósito no solo presentan dificultades en su interpretación individual, sino también porque las diferentes variables pueden interactuar de manera compleja y entrelazada.
+
+## Modificaciones
+
+Dado que la variable objetivo del conjunto de datos que descargamos no presentaba una estructura de clasificación binaria, fue necesario llevar a cabo una adaptación en nuestra base de datos. En el conjunto de datos original, se encontraba una columna denominada 'quality', la cual reflejaba la calidad del vino mediante un valor numérico que oscilaba entre 1 (representando el vino de menor calidad) y 10 (indicando el vino de mayor calidad). Ante esta situación, se optó por ajustar esta variable predictora para adecuarla a nuestra problemática de clasificación binaria.
+
+Este proceso implicó calcular tanto la mediana como el promedio de los valores presentes en la columna 'quality' de las 4898 instancias de nuestro conjunto de datos. Además, se procedió a elaborar un histograma para visualizar la frecuencia de aparición de cada valor en 'quality'. Esta visualización permitió establecer un umbral de corte que demarcara la distinción entre un vino de calidad superior y otro de calidad inferior. La selección de este punto de corte fue llevada a cabo con el objetivo de lograr una distribución equitativa de los datos en ambas categorías de calidad.
+
+#### Mediana
+La mediana de la calidad del vino es:
+```{r, echo = FALSE}
 datos <- read.csv("./data/winequality-white.csv", sep = ';')
 
 median(datos$quality)
 
+```
+
+#### Promedio
+El promedio de la calidad del vino es:
+```{r, echo = FALSE}
 mean(datos$quality)
 
 ```
 
-```{r}
+#### Histograma 
+Examinemos los datos a través de un histograma.
 
-hist(datos$quality)
+```{r, echo = FALSE}
+
+hist(datos$quality, main = "Distribución de la Calidad del Vino", xlab = "Calidad", ylab = "Frecuencia", col = "lightblue")
+
 
 ```
 
-A partir de estos resultados, consideramos que el valor 6 es un buen punto de corte para nuestra clasificación binaria. 
+Basándonos en estos resultados, hemos llegado a la conclusión de que el valor 6 es un umbral adecuado para llevar a cabo nuestra clasificación binaria.
 
-
-Nuestro próximo paso fue utilizar la información que adquirimos con los calculos previos para modificar nuestra variable a predecir, valiendo 1 en caso de que 'quality' sea mayor a 6, y 0 en caso contrario.
+En la siguiente etapa, empleamos los conocimientos obtenidos a partir de los cálculos anteriores para transformar nuestra variable objetivo. Esta variable tomará el valor 1 si 'quality' es mayor a 6, y el valor 0 en caso contrario.
 
 ```{r}
 
@@ -68,7 +103,7 @@ head(datos$quality, n = 20)
 
 Podemos ver como los valores mayores o iguales a 6 fueron reemplazados por un 1, y los valores menores a 6 por un 0.
 
-5) Guarde el archivo a analizar en formato CSV tradicional (texto plano delimitado por comas, en donde la primera fila debe contener los nombres de las variables).
+5)  Guarde el archivo a analizar en formato CSV tradicional (texto plano delimitado por comas, en donde la primera fila debe contener los nombres de las variables).
 
 Nuestro dataset no vino en formato tradicional ya que el separador usado era ';'. De todas maneras, al modificar la columna como hicimos en el ultimo código, aprovechamos para escribir el nuevo csv con separador ','. Luego de eso, el dataset quedo en formato tradicional.
 
@@ -77,5 +112,3 @@ Nuestro dataset no vino en formato tradicional ya que el separador usado era ';'
 head(datos, n = 10)
 
 ```
-
-
