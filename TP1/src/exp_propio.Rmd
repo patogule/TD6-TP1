@@ -38,7 +38,7 @@ variable_importance_churn <- tree_churn$variable.importance
 
 mean_variable_importance_churn <- mean(variable_importance_churn)
 
-#data.frame(Churn_Importance = variable_importance_churn)
+data.frame(Churn_Importance = variable_importance_churn)
 ```
 
 ```{r, echo=FALSE}
@@ -53,7 +53,7 @@ variable_importance_heart <- tree_heart$variable.importance
 
 mean_variable_importance_heart <- mean(variable_importance_heart)
 
-#data.frame(Heart_Importance = variable_importance_heart)
+data.frame(Heart_Importance = variable_importance_heart)
 ```
 
 ```{r, echo=FALSE}
@@ -68,7 +68,7 @@ variable_importance_wine <- tree_wine$variable.importance
 
 mean_variable_importance_wine <- mean(variable_importance_wine)
 
-#data.frame(Wine_Importance = variable_importance_wine)
+data.frame(Wine_Importance = variable_importance_wine)
 ```
 A partir de estos valores de importancia, establecimos una estrategia para determinar qué variables serían incluidas en el nuevo conjunto de datos. Para ello, calculamos el valor promedio de importancia de todas las variables presentes en cada uno de los conjunto de datos originales. Posteriormente, seleccionamos aquellas variables cuya importancia superara este promedio. Como resultado, cada uno de los conjuntos de datos originales se redujo a un conjunto de seis variables predictoras de mayor relevancia.
 
