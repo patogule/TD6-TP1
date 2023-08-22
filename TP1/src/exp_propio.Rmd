@@ -2,26 +2,30 @@
 title: "exp_propio"
 author: "Patricio Guledjian, Azul Noguera, Rocio Gonzalez"
 date: "2023-08-17"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
-```{r}
+```{r, echo=FALSE}
 source("exp_propio.R")
 ```
 
-```{r}
+```{r, echo=FALSE}
 library(rpart)
+```
 
-#Buscamos las variables mas importantes de el dataset Wine.
-datos_wine <- read.csv("./data/winequality_modificados.csv")
-data_df_wine <- datos_wine
+# Experimento propio
 
-tree_wine <- rpart(quality ~ ., data=data_df_wine, control=rpart.control(minsplit=2, minbucket=1, maxdepth=10, cp=0, xval=0))
+### Introducción
 
-variable_importance_wine <- tree_wine$variable.importance
-tree_wine$variable.importance
-mean(variable_importance_wine)
-################################################################################
+El objetivo de nuestro experimento consistió en explorar y comprender el impacto de las variables en el rendimiento del modelo. A través del análisis de las variables más influyentes, buscamos obtener una visión más profunda de cómo se toman decisiones en el contexto de cada conjunto de datos. Además, evaluamos si la selección de características relevantes podría potencialmente mejorar el desempeño del modelo.
+
+Nuestro enfoque implicó identificar las variables más significativas en función del comportamiento del modelo original y, posteriormente, elegir las variables más influyentes para construir un nuevo modelo. Esta estrategia nos permitió comparar el rendimiento del nuevo modelo con el del original y analizar cualquier diferencia resultante.
+
+En una primera etapa, evaluamos la importancia de los atributos en el modelo original utilizando rpart. En este contexto, una alta puntuación de importancia sugiere que la variable ejerce una mayor influencia en las decisiones tomadas por el árbol, y por ende, en las predicciones resultantes.
+
+```{r, echo=FALSE}
 
 #Buscamos las variables mas importantes de el dataset Churn
 datos_churn <- read.csv("./data/customer_churn.csv")
@@ -30,9 +34,13 @@ data_df_churn <- datos_churn
 tree_churn <- rpart(churn ~ ., data=data_df_churn, control=rpart.control(minsplit=2, minbucket=1, maxdepth=10, cp=0, xval=0))
 
 variable_importance_churn <- tree_churn$variable.importance
-tree_churn$variable.importance
-mean(variable_importance_churn)
-################################################################################
+
+mean_variable_importance_churn <- mean(variable_importance_churn)
+
+data.frame(Churn_Importance = variable_importance_churn)
+```
+
+```{r, echo=FALSE}
 
 #Buscamos las variables mas importantes de el dataset Heart
 datos_heart <- read.csv("./data/heart.csv")
@@ -41,29 +49,135 @@ data_df_heart <- datos_heart
 tree_heart <- rpart(HeartDisease ~ ., data=data_df_heart, control=rpart.control(minsplit=2, minbucket=1, maxdepth=10, cp=0, xval=0))
 
 variable_importance_heart <- tree_heart$variable.importance
-tree_heart$variable.importance
-mean(variable_importance_heart)
-################################################################################
+
+mean_variable_importance_heart <- mean(variable_importance_heart)
+
+data.frame(Heart_Importance = variable_importance_heart)
 ```
 
+```{r, echo=FALSE}
+
+#Buscamos las variables mas importantes de el dataset Wine.
+datos_wine <- read.csv("./data/winequality_modificados.csv")
+data_df_wine <- datos_wine
+
+tree_wine <- rpart(quality ~ ., data=data_df_wine, control=rpart.control(minsplit=2, minbucket=1, maxdepth=10, cp=0, xval=0))
+
+variable_importance_wine <- tree_wine$variable.importance
+
+mean_variable_importance_wine <- mean(variable_importance_wine)
+
+data.frame(Wine_Importance = variable_importance_wine)
+```
+A partir de estos valores de importancia, establecimos una estrategia para determinar qué variables serían incluidas en el nuevo conjunto de datos. Para ello, calculamos el valor promedio de importancia de todas las variables presentes en el conjunto de datos original. Posteriormente, seleccionamos aquellas variables cuya importancia superara este promedio. Como resultado, cada uno de los conjuntos de datos originales se redujo a un conjunto de seis variables predictoras de mayor relevancia.
+
 ```{r}
-#Decidimos cuantas variables darle a cada nuevo dataset. Para eso, nos quedamos con todas las variables que superen en importancia al promedio.
+#Tabla con importancia promedio por dataset 
+data.frame(Dataset = c("ChurnRate", "HeartDisease", "WineQuality"), 
+           Importancia_Promedio = c(mean_variable_importance_churn, mean_variable_importance_heart, mean_variable_importance_wine)
+           )
+```
 
-num_top_variables_wine <- 6
-num_top_variables_churn <- 6
-num_top_variables_heart <- 6
+```{r, echo=FALSE}
+#Graficamos la importancia de cada variable y el promedio
+library(ggplot2)
 
-top_variables_wine <- names(sort(variable_importance_wine, decreasing = TRUE)[1:num_top_variables_wine])
-top_variables_churn <- names(sort(variable_importance_churn, decreasing = TRUE)[1:num_top_variables_churn])
-top_variables_heart <- names(sort(variable_importance_heart, decreasing = TRUE)[1:num_top_variables_heart])
+# Crear un data frame con las variables y sus importancias
+variable_importance_datac <- data.frame(
+  Variable = names(tree_churn$variable.importance),
+  Importance = tree_churn$variable.importance
+)
 
-# Crear un nuevo conjunto de datos de entrenamiento con las variables más importantes y la variable objetivo
-winequality_top <- datos[, c(top_variables_wine, "quality")]
+# Calcular la media de las importancias
+mean_importance <- mean(variable_importance_datac$Importance)
+
+# Crear el scatter plot con la línea de media
+scatter_plot <- ggplot(variable_importance_datac, aes(x = Variable, y = Importance)) +
+  geom_point() +
+  geom_hline(yintercept = mean_importance, color = "red", size = 0.5) +
+  labs(x = "Variable", y = "Importance", title = "Churn Variable Importance Scatter Plot") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title = element_text(hjust = 0.5, face = 'bold')) 
+        
+# Mostrar el scatter plot
+print(scatter_plot)
+```
+
+```{r, echo=FALSE}
+#Graficamos la importancia de cada variable y el promedio
+library(ggplot2)
+
+# Crear un data frame con las variables y sus importancias
+variable_importance_datah <- data.frame(
+  Variable = names(tree_heart$variable.importance),
+  Importance = tree_heart$variable.importance
+)
+
+# Calcular la media de las importancias
+mean_importance <- mean(variable_importance_datah$Importance)
+
+# Crear el scatter plot con la línea de media
+scatter_plot <- ggplot(variable_importance_datah, aes(x = Variable, y = Importance)) +
+  geom_point() +
+  geom_hline(yintercept = mean_importance, color = "red", size = 0.5) +
+  labs(x = "Variable", y = "Importance", title = "Heart Variable Importance Scatter Plot") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title = element_text(hjust = 0.5, face = 'bold')) 
+        
+# Mostrar el scatter plot
+print(scatter_plot)
+```
+
+
+```{r, echo=FALSE}
+#Graficamos la importancia de cada variable y el promedio
+library(ggplot2)
+
+# Crear un data frame con las variables y sus importancias
+variable_importance_dataw <- data.frame(
+  Variable = names(tree_wine$variable.importance),
+  Importance = tree_wine$variable.importance
+)
+
+# Calcular la media de las importancias
+mean_importance <- mean(variable_importance_dataw$Importance)
+
+# Crear el scatter plot con la línea de media
+scatter_plot <- ggplot(variable_importance_dataw, aes(x = Variable, y = Importance)) +
+  geom_point() +
+  geom_hline(yintercept = mean_importance, color = "red", size = 0.5) +
+  labs(x = "Variable", y = "Importance", title = "Wine Variable Importance Scatter Plot") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title = element_text(hjust = 0.5, face = 'bold')) 
+        
+# Mostrar el scatter plot
+print(scatter_plot)
+```
+```{r, echo=FALSE}
+#Decidimos cuantas variables dejar en cada nuevo dataset. Para eso, nos quedamos con todas las variables que superen en importancia al promedio.
+
+top_variables_churn <- names(variable_importance_churn[variable_importance_churn > mean_variable_importance_churn])
+top_variables_heart <- names(variable_importance_heart[variable_importance_heart > mean_variable_importance_heart])
+top_variables_wine <- names(variable_importance_wine[variable_importance_wine > mean_variable_importance_wine])
+
+```
+
+A partir de esto, obtuvimos los nuevos datasets que contienen las variables que cumplían con la condición planteada anteriormente. 
+
+
+```{r, echo=FALSE}
+
+# Creamos un nuevo conjunto de datos de entrenamiento con las variables más importantes y la variable objetivo
 customer_churn_top <- datos_churn[, c(top_variables_churn, "churn")]
 heart_top <- datos_heart[, c(top_variables_heart, "HeartDisease")]
+winequality_top <- datos_wine[, c(top_variables_wine, "quality")]
+
 ```
 
-```{r}
+```{r, echo=FALSE}
 #Cargamos los 3 nuevos datasets en la carpeta 'data'.
 
 ruta_archivo_nuevo <- "./data/winequality_top.csv"
@@ -76,55 +190,107 @@ ruta_archivo_nuevo <- "./data/heart_top.csv"
 write.csv(heart_top, file=ruta_archivo_nuevo, sep = ',', row.names=FALSE)
 ```
 
-```{r}
+```{r, echo=FALSE}
+#Tabla que muestra para cada dataset, las variables cuya importancia supera la del promedio.
 
-library(magick)
-
-# Ruta de la imagen JPG
-ruta_imagen <- "./outputs/plots/exp_propio.jpg"
-
-# Cargar y mostrar la imagen
-imagen <- image_read(ruta_imagen)
-# Redimensionar la imagen para ajustarla al tamaño de la consola
-imagen_redimensionada <- image_scale(imagen, "475x500")
-
-# Mostrar la imagen redimensionada en la consola
-print(imagen_redimensionada)
+data.frame(
+          Churn_variables = top_variables_churn,
+          Heart_variables = top_variables_heart,
+          Quality_variables = top_variables_wine
+          )
 
 ```
 
-Lo que propusimos en nuestro experimento fue seleccionar las variables mas importantes a la hora de crear el modelo, y de esa forma analizar como se compara su performance al modelo original. Llevamos a cabo la obtencion de las variables mas importantes con rpart, y luego tuvimos que elegir una estrategia para decidir que variables formaran parte del nuevo dataset. Para eso, calculamos la media entre todas las importancias de las variables del dataset original, y a partir de este valor nos quedamos con todas aquellas variables cuya importancia era mayor al promedio. Asi, cada uno de los datasets original termino siendo reducido a un total de 6 variables predictoras.
+### Resultados
 
-Hicimos este experimento para analizar si al tener mas variables predictoras, la performance siempre sera mayor, o si todo depende de la importancia de cada una de ellas y las particularidades de los datasets. Calculamos la performance de los 3 datasets originales, y de los 3 datasets con las 6 variables predictoras.
+![Resultados](./outputs/plots/exp_propio.jpg)
+Llevamos a cabo este experimento con la finalidad de indagar si incrementar el número de variables predictoras inevitablemente resulta en una mejora en el rendimiento del modelo, o si este resultado está condicionado por la importancia intrínseca de cada variable y las características particulares de los conjuntos de datos. Para efectuar este análisis, evaluamos el desempeño de los tres conjuntos de datos originales, junto con el de tres conjuntos de datos que fueron reducidos únicamente a las variables más significativas.
 
-Comencemos con las observaciones:
+A grandes rasgos, podemos observar que las diferencias de rendimiento entre los conjuntos de datos originales y los conjuntos de datos reducidos son en su mayoría mínimas, siendo las performances prácticamente idénticas. Si profundizamos en los detalles, a medida que aumentamos la profundidad del árbol, se observa una ligera tendencia en la cual los conjuntos de datos originales tienen un rendimiento ligeramente superior en comparación con los conjuntos de datos reducidos.
 
-- En primer lugar, podemos ver que las performances de los datasets originales vs datasets reducidos son en general muy parecidos, con una performance casi identica. Si decidimos ponernos mas especificos, a mas profundidad del arbol, los datasets originales tienden a tener apenas mas de performance que los 
+Ahora, profundicemos en cada caso particular para determinar si este comportamiento tiene sentido en cada contexto.
 
+Churn:
+Tanto el conjunto de datos original de churn como el conjunto reducido exhiben un comportamiento sorprendentemente parecido. Las discrepancias en el rendimiento a lo largo de las profundidades del árbol son mínimas, y se observa que los picos de rendimiento se alcanzan prácticamente al mismo tiempo. Además, los valores máximos de rendimiento se sitúan en torno a 0.9, señalando un nivel de predicción bastante sólido en ambos conjuntos de datos. Además, es interesante notar que el conjunto de datos original mantiene una ligera ventaja en términos de rendimiento en todas las iteraciones de entrenamiento de los árboles.
 
+La aparente falta de impacto en el rendimiento podría sugerir que las variables que se eliminaron no desempeñaban un papel significativo en la capacidad del modelo para anticipar las tasas de abandono. Esto podría indicar que, dentro de este contexto particular, las variables que aún permanecen son capaces de capturar de manera adecuada la información relevante para realizar predicciones sólidas acerca del churn. En el marco de la tasa de abandono (churn rate), resulta lógico que las variables que estén directamente relacionadas con los comportamientos y características de los clientes tengan un impacto sustancial en las predicciones. Las variables que mantuvieron una alta importancia se centran en aspectos como los patrones de llamadas, la frecuencia de uso y el valor del cliente. Estos factores pueden representar señales potentes acerca de si un cliente es más propenso a abandonar el servicio o a mantenerlo.
 
+Una observación importante es que las variables eliminadas podrían haber carecido de aporte informativo único o estar altamente correlacionadas con las variables restantes. Esta correlación podría haber disminuido su valor predictivo cuando ya se consideran las otras características relevantes.
 
+Veamos la corrrelación...
 
+```{r, echo=FALSE}
+# Cargar los paquetes necesarios
+library(dplyr)
 
+# Convertir variables categóricas a numéricas (one-hot encoding)
+datos_churn <- datos_churn %>%
+  mutate_if(is.character, as.factor) %>%
+  mutate(across(where(is.factor), as.numeric))
 
+# Calcular la matriz de correlación
+cor_churn <- cor(datos_churn)
+```
 
+```{r, echo=FALSE}
+# Cargar los paquetes necesarios
+library(ggplot2)
+library(reshape2) 
 
+# Crear una función para generar un heatmap de correlación
+plot_correlation_heatmap <- function(cor_matrix, title) {
+  melted_cor <- melt(cor_matrix)  # Convertir la matriz de correlación en un formato de datos adecuado
+  ggplot(data = melted_cor, aes(x = Var1, y = Var2, fill = value)) +
+    geom_tile() +
+    scale_fill_gradient2(low = "blue", high = "red", mid = "white",
+                         midpoint = 0, limit = c(-1,1),
+                         name = "Correlation") +
+    labs(title = title) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1),
+          legend.position = "right",
+          plot.title = element_text(hjust = 0.5, face = 'bold'))
+}
 
+# Crear un heatmap de correlación para cada conjunto de datos
+plot_correlation_heatmap(cor_churn, "Correlation Heatmap - Churn Dataset")
 
+```
+Al analizar los valores de correlación entre las variables eliminadas y las restantes, notamos que en su mayoría son bajos. Esto sugiere que no existía una correlación fuerte entre las variables descartadas y las que se mantuvieron. Como resultado, es plausible pensar que las variables eliminadas posiblemente no añadían información distintiva que permitiera diferenciar entre las clases de predicción.
 
+En conjunto, estos resultados sugieren que las variables más influyentes para predecir el churn están siendo capturadas por las variables que se mantienen, y que la inclusión o exclusión de las variables menos relevantes no afecta de manera significativa la capacidad del modelo para realizar predicciones precisas en este contexto particular.
 
+Heart:
+Dentro del ámbito de las enfermedades cardíacas, las variables que se conservan abordan elementos cruciales como la reacción del corazón al ejercicio, la manifestación de angina inducida por el ejercicio, y características relacionadas con la edad y la sensación de dolor en el pecho. Estas variables actúan como indicadores fundamentales para evaluar la salud cardíaca y podrían desempeñar un papel esencial en la predicción de enfermedades cardíacas. Es lógico suponer que ciertas variables, como el género, posiblemente carezcan de información única suficiente para diferenciar de manera relevante entre las distintas clases de predicción.
 
+```{r, echo=FALSE}
+# Cargar los paquetes necesarios
+library(dplyr)
 
+# Convertir variables categóricas a numéricas (one-hot encoding)
+datos_heart <- datos_heart %>%
+  mutate_if(is.character, as.factor) %>%
+  mutate(across(where(is.factor), as.numeric))
 
+# Calcular la matriz de correlación
+cor_heart <- cor(datos_heart)
 
+plot_correlation_heatmap(cor_heart, "Correlation Heatmap - Heart Dataset")
+```
 
+Wine:
+Este dataset es el que parece verse menos afectado por la eliminacion de variables, si comparamos el rendimiento del dataset original con el dataset reducido no parece existir ninguna diferencia de comportamiento. 
 
+En el contexto de la calidad del vino, las variables restantes incluyen características químicas y físicas del vino. Estas variables pueden influir en la calidad percibida y real del vino. Dado que la calidad del vino se basa en componentes químicos y sensoriales, las variables seleccionadas son fundamentales para determinar cómo se percibirá el vino en términos de calidad.
 
+```{r, echo=FALSE}
+# Cargar los paquetes necesarios
+library(dplyr)
 
+# Calcular la matriz de correlación
+cor_wine <- cor(datos_wine)
 
-
-
-
-
+plot_correlation_heatmap(cor_wine, "Correlation Heatmap - Wine Dataset")
+```
 
 
