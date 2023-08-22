@@ -1,5 +1,5 @@
 ---
-title: "exp_propio"
+title: "Experimento Propio"
 author: "Patricio Guledjian, Azul Noguera, Rocio Gonzalez"
 date: "2023-08-17"
 output:
@@ -15,9 +15,7 @@ source("exp_propio.R")
 library(rpart)
 ```
 
-# Experimento propio
-
-### Introducción
+## Introducción
 
 El objetivo de nuestro experimento consistió en explorar y comprender el impacto de las variables en el rendimiento del modelo. A través del análisis de las variables más influyentes, buscamos obtener una visión más profunda de cómo se toman decisiones en el contexto de cada conjunto de datos. Además, evaluamos si la selección de características relevantes podría potencialmente mejorar el desempeño del modelo.
 
@@ -71,7 +69,7 @@ data.frame(Wine_Importance = variable_importance_wine)
 ```
 A partir de estos valores de importancia, establecimos una estrategia para determinar qué variables serían incluidas en el nuevo conjunto de datos. Para ello, calculamos el valor promedio de importancia de todas las variables presentes en el conjunto de datos original. Posteriormente, seleccionamos aquellas variables cuya importancia superara este promedio. Como resultado, cada uno de los conjuntos de datos originales se redujo a un conjunto de seis variables predictoras de mayor relevancia.
 
-```{r}
+```{r, echo=FALSE}
 #Tabla con importancia promedio por dataset 
 data.frame(Dataset = c("ChurnRate", "HeartDisease", "WineQuality"), 
            Importancia_Promedio = c(mean_variable_importance_churn, mean_variable_importance_heart, mean_variable_importance_wine)
@@ -92,16 +90,15 @@ variable_importance_datac <- data.frame(
 mean_importance <- mean(variable_importance_datac$Importance)
 
 # Crear el scatter plot con la línea de media
-scatter_plot <- ggplot(variable_importance_datac, aes(x = Variable, y = Importance)) +
+scatter_plot_c <- ggplot(variable_importance_datac, aes(x = Variable, y = Importance)) +
   geom_point() +
   geom_hline(yintercept = mean_importance, color = "red", size = 0.5) +
   labs(x = "Variable", y = "Importance", title = "Churn Variable Importance Scatter Plot") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
-        plot.title = element_text(hjust = 0.5, face = 'bold')) 
-        
-# Mostrar el scatter plot
-print(scatter_plot)
+        plot.title = element_text(hjust = 0.5),
+        plot.margin = margin(1, 1, 1, 1, "cm")
+        ) 
 ```
 
 ```{r, echo=FALSE}
@@ -118,18 +115,15 @@ variable_importance_datah <- data.frame(
 mean_importance <- mean(variable_importance_datah$Importance)
 
 # Crear el scatter plot con la línea de media
-scatter_plot <- ggplot(variable_importance_datah, aes(x = Variable, y = Importance)) +
+scatter_plot_h <- ggplot(variable_importance_datah, aes(x = Variable, y = Importance)) +
   geom_point() +
   geom_hline(yintercept = mean_importance, color = "red", size = 0.5) +
   labs(x = "Variable", y = "Importance", title = "Heart Variable Importance Scatter Plot") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
-        plot.title = element_text(hjust = 0.5, face = 'bold')) 
-        
-# Mostrar el scatter plot
-print(scatter_plot)
+        plot.title = element_text(hjust = 0.5),
+        plot.margin = margin(1, 1, 1, 1, "cm")) 
 ```
-
 
 ```{r, echo=FALSE}
 #Graficamos la importancia de cada variable y el promedio
@@ -145,17 +139,34 @@ variable_importance_dataw <- data.frame(
 mean_importance <- mean(variable_importance_dataw$Importance)
 
 # Crear el scatter plot con la línea de media
-scatter_plot <- ggplot(variable_importance_dataw, aes(x = Variable, y = Importance)) +
+scatter_plot_w <- ggplot(variable_importance_dataw, aes(x = Variable, y = Importance)) +
   geom_point() +
   geom_hline(yintercept = mean_importance, color = "red", size = 0.5) +
   labs(x = "Variable", y = "Importance", title = "Wine Variable Importance Scatter Plot") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
-        plot.title = element_text(hjust = 0.5, face = 'bold')) 
-        
-# Mostrar el scatter plot
-print(scatter_plot)
+        plot.title = element_text(hjust = 0.5),
+        plot.margin = margin(1, 1, 1, 1, "cm")) 
 ```
+
+### Variables importantes del dataset Churn
+
+```{r, echo=FALSE}
+scatter_plot_c
+```
+
+### Variables importantes del dataset Heart
+
+```{r, echo=FALSE}
+scatter_plot_h
+```
+
+### Variables importantes del dataset Wine
+
+```{r, echo=FALSE}
+scatter_plot_w
+```
+
 ```{r, echo=FALSE}
 #Decidimos cuantas variables dejar en cada nuevo dataset. Para eso, nos quedamos con todas las variables que superen en importancia al promedio.
 
@@ -167,9 +178,8 @@ top_variables_wine <- names(variable_importance_wine[variable_importance_wine > 
 
 A partir de esto, obtuvimos los nuevos datasets que contienen las variables que cumplían con la condición planteada anteriormente. 
 
-
+### Variables en datasets reducidos
 ```{r, echo=FALSE}
-
 # Creamos un nuevo conjunto de datos de entrenamiento con las variables más importantes y la variable objetivo
 customer_churn_top <- datos_churn[, c(top_variables_churn, "churn")]
 heart_top <- datos_heart[, c(top_variables_heart, "HeartDisease")]
@@ -180,6 +190,8 @@ winequality_top <- datos_wine[, c(top_variables_wine, "quality")]
 ```{r, echo=FALSE}
 #Cargamos los 3 nuevos datasets en la carpeta 'data'.
 
+suppressWarnings({
+  
 ruta_archivo_nuevo <- "./data/winequality_top.csv"
 write.csv(winequality_top, file=ruta_archivo_nuevo, sep = ',', row.names=FALSE)
 
@@ -188,20 +200,22 @@ write.csv(customer_churn_top, file=ruta_archivo_nuevo, sep = ',', row.names=FALS
 
 ruta_archivo_nuevo <- "./data/heart_top.csv"
 write.csv(heart_top, file=ruta_archivo_nuevo, sep = ',', row.names=FALSE)
+
+})
 ```
 
 ```{r, echo=FALSE}
-#Tabla que muestra para cada dataset, las variables cuya importancia supera la del promedio.
+#Tabla que muestra las variables incluidas en los nuevos datasets
 
 data.frame(
           Churn_variables = top_variables_churn,
           Heart_variables = top_variables_heart,
-          Quality_variables = top_variables_wine
+          Wine_variables = top_variables_wine
           )
 
 ```
 
-### Resultados
+## Resultados
 
 ![Resultados](./outputs/plots/exp_propio.jpg)
 Llevamos a cabo este experimento con la finalidad de indagar si incrementar el número de variables predictoras inevitablemente resulta en una mejora en el rendimiento del modelo, o si este resultado está condicionado por la importancia intrínseca de cada variable y las características particulares de los conjuntos de datos. Para efectuar este análisis, evaluamos el desempeño de los tres conjuntos de datos originales, junto con el de tres conjuntos de datos que fueron reducidos únicamente a las variables más significativas.
@@ -210,7 +224,8 @@ A grandes rasgos, podemos observar que las diferencias de rendimiento entre los 
 
 Ahora, profundicemos en cada caso particular para determinar si este comportamiento tiene sentido en cada contexto.
 
-Churn:
+### Churn
+
 Tanto el conjunto de datos original de churn como el conjunto reducido exhiben un comportamiento sorprendentemente parecido. Las discrepancias en el rendimiento a lo largo de las profundidades del árbol son mínimas, y se observa que los picos de rendimiento se alcanzan prácticamente al mismo tiempo. Además, los valores máximos de rendimiento se sitúan en torno a 0.9, señalando un nivel de predicción bastante sólido en ambos conjuntos de datos. Además, es interesante notar que el conjunto de datos original mantiene una ligera ventaja en términos de rendimiento en todas las iteraciones de entrenamiento de los árboles.
 
 La aparente falta de impacto en el rendimiento podría sugerir que las variables que se eliminaron no desempeñaban un papel significativo en la capacidad del modelo para anticipar las tasas de abandono. Esto podría indicar que, dentro de este contexto particular, las variables que aún permanecen son capaces de capturar de manera adecuada la información relevante para realizar predicciones sólidas acerca del churn. En el marco de la tasa de abandono (churn rate), resulta lógico que las variables que estén directamente relacionadas con los comportamientos y características de los clientes tengan un impacto sustancial en las predicciones. Las variables que mantuvieron una alta importancia se centran en aspectos como los patrones de llamadas, la frecuencia de uso y el valor del cliente. Estos factores pueden representar señales potentes acerca de si un cliente es más propenso a abandonar el servicio o a mantenerlo.
@@ -218,6 +233,7 @@ La aparente falta de impacto en el rendimiento podría sugerir que las variables
 Una observación importante es que las variables eliminadas podrían haber carecido de aporte informativo único o estar altamente correlacionadas con las variables restantes. Esta correlación podría haber disminuido su valor predictivo cuando ya se consideran las otras características relevantes.
 
 Veamos la corrrelación...
+
 
 ```{r, echo=FALSE}
 # Cargar los paquetes necesarios
@@ -256,12 +272,23 @@ plot_correlation_heatmap <- function(cor_matrix, title) {
 plot_correlation_heatmap(cor_churn, "Correlation Heatmap - Churn Dataset")
 
 ```
+
 Al analizar los valores de correlación entre las variables eliminadas y las restantes, notamos que en su mayoría son bajos. Esto sugiere que no existía una correlación fuerte entre las variables descartadas y las que se mantuvieron. Como resultado, es plausible pensar que las variables eliminadas posiblemente no añadían información distintiva que permitiera diferenciar entre las clases de predicción.
 
 En conjunto, estos resultados sugieren que las variables más influyentes para predecir el churn están siendo capturadas por las variables que se mantienen, y que la inclusión o exclusión de las variables menos relevantes no afecta de manera significativa la capacidad del modelo para realizar predicciones precisas en este contexto particular.
 
-Heart:
+### Heart 
+
+Al observar detenidamente los gráficos de rendimiento comparativo entre el dataset original y el dataset reducido de "Heart Disease", no se evidencian diferencias significativas que merezcan ser destacadas. Las tendencias predominantes en la evolución del rendimiento son sorprendentemente similares. Los picos de rendimiento máximo, se alcanzan prácticamente con la misma profundidad. Asimismo, la evolución del rendimiento a lo largo de las diferentes profundidades es casi idéntico y ambos datasets se comportan de la 
+No obstante, es interesante resaltar que cuando se alcanza una profundidad más allá de un nivel 12, el dataset original muestra un rendimiento ligeramente superior en comparación con el dataset reducido. 
+
+A partir de esto, podríamos inferir que la reducción del dataset no parece haber ejercido una influencia notoria ni positiva ni negativa en el rendimiento del modelo. En consecuencia, se podría concluir que las variables eliminadas no aportaban un volumen significativo de información valiosa al modelo.
+
+A continuación, es importante examinar si este resultado tiene fundamento en el contexto de las enfermedades cardíacas. Es decir, si las variables que fueron eliminadas intuitivamente carecen de información sustancial o relevante para la detección de patrones relacionados con las enfermedades cardíacas.
+
 Dentro del ámbito de las enfermedades cardíacas, las variables que se conservan abordan elementos cruciales como la reacción del corazón al ejercicio, la manifestación de angina inducida por el ejercicio, y características relacionadas con la edad y la sensación de dolor en el pecho. Estas variables actúan como indicadores fundamentales para evaluar la salud cardíaca y podrían desempeñar un papel esencial en la predicción de enfermedades cardíacas. Es lógico suponer que ciertas variables, como el género, posiblemente carezcan de información única suficiente para diferenciar de manera relevante entre las distintas clases de predicción.
+
+Examinemos si las variables que fueron eliminadas podrían haber estado relacionadas con aquellas que demostraron una mayor importancia, lo que podría haber motivado su exclusión del modelo.
 
 ```{r, echo=FALSE}
 # Cargar los paquetes necesarios
@@ -277,11 +304,23 @@ cor_heart <- cor(datos_heart)
 
 plot_correlation_heatmap(cor_heart, "Correlation Heatmap - Heart Dataset")
 ```
+Observando la matriz de correlación entre las variables, notamos que las correlaciones entre las variables eliminadas y las variables restantes son en su mayoría bastante bajas. Esto sugiere que no había una correlación fuerte entre las variables que fueron eliminadas y las que se mantuvieron en el modelo. Es decir, estas variables eliminadas no estaban altamente correlacionadas con ninguna de las variables que se consideraron importantes.
 
-Wine:
-Este dataset es el que parece verse menos afectado por la eliminacion de variables, si comparamos el rendimiento del dataset original con el dataset reducido no parece existir ninguna diferencia de comportamiento. 
+Por lo tanto, la eliminación de estas variables no parece haber sido influenciada por la correlación directa con las variables restantes. Es posible que estas variables no aportaran suficiente información única o no fueran consideradas relevantes por otras razones, lo que podría haber llevado a su exclusión del modelo.
+
+En resumen, parece que la eliminación de variables en el modelo de enfermedades cardíacas no estuvo fuertemente influenciada por la correlación con las variables restantes. Es probable que la selección se haya basado más en la relevancia clínica de las variables y en la capacidad de aportar información distintiva al modelo de predicción de enfermedades cardíacas.
+
+### Wine
+
+Al realizar un análisis de los gráficos de rendimiento del conjunto de datos de calidad de vinos, se observa que este dataset es el que parece presentar la menor influencia por la eliminación de variables. Al comparar detalladamente el rendimiento del conjunto de datos original con el conjunto de datos reducido, no se evidencia ninguna alteración significativa en su comportamiento general.
+
+Esta estabilidad en el rendimiento podría sugerir que las variables que se eliminaron del conjunto de datos, en este caso "residual sugar" (azúcar residual) y "pH," posiblemente no desempeñaban un papel crítico en la capacidad del modelo para predecir la calidad de los vinos. A pesar de la exclusión de estas variables, el modelo mantiene una consistencia en su rendimiento al predecir la calidad de los vinos.
+
+Una hipótesis plausible para este fenómeno es que, en el contexto de la calidad del vino, las características aportadas por las variables eliminadas podrían haber sido redundantes o estar altamente correlacionadas con otras propiedades sensoriales y químicas del vino que siguen presentes en el conjunto de datos. Por lo tanto, la eliminación de estas variables parece no afectar sustancialmente la capacidad del modelo para hacer predicciones precisas sobre la calidad del vino.
 
 En el contexto de la calidad del vino, las variables restantes incluyen características químicas y físicas del vino. Estas variables pueden influir en la calidad percibida y real del vino. Dado que la calidad del vino se basa en componentes químicos y sensoriales, las variables seleccionadas son fundamentales para determinar cómo se percibirá el vino en términos de calidad.
+
+Es importante analizar si las variables que se eliminaron del conjunto de datos de calidad de vinos podrían haber estado relacionadas con aquellas que se mantuvieron en el modelo. Para hacerlo, observemos el mapa de calor que muestra la correlación entre las variables.
 
 ```{r, echo=FALSE}
 # Cargar los paquetes necesarios
@@ -293,4 +332,6 @@ cor_wine <- cor(datos_wine)
 plot_correlation_heatmap(cor_wine, "Correlation Heatmap - Wine Dataset")
 ```
 
+En este caso, no se observan correlaciones particularmente altas o evidentes entre las variables eliminadas y las que se mantuvieron. Por ejemplo, las variables "fixed.acidity," "chlorides," y "pH" presentan correlaciones con las variables restantes que son bastante bajas, lo que sugiere que no hay una fuerte relación lineal entre estas variables.
 
+Dado que las correlaciones no muestran una conexión clara entre las variables eliminadas y las variables que se mantuvieron en el modelo, es posible que las variables eliminadas no hayan sido excluidas debido a una correlación directa con las variables restantes. En cambio, otras consideraciones, como redundancia de información, relevancia contextual o impacto en la capacidad predictiva, parecen haber influido en su eliminación.
