@@ -1,12 +1,4 @@
 ---
-<<<<<<< Updated upstream
-title: "exp_propio"
-author: "Patricio Guledjian, Azul Noguera, Rocio Gonzalez"
-date: "2023-08-17"
-output:
-  pdf_document: default
-  html_document: default
-=======
 title: "Experimento Propio"
 author: 
     - "Patricio Guledjuan"
@@ -14,7 +6,6 @@ author:
     - "Rocio Gonzalez"
 date: "`r Sys.Date()`"
 output: pdf_document
->>>>>>> Stashed changes
 ---
 
 ```{r, echo=FALSE}
