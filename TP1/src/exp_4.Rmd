@@ -12,6 +12,7 @@ output: pdf_document
 source("exp_4.R")
 ```
 
+## Investigación
 
 En el presente experimento, investigamos el impacto del ruido presente en la variable objetivo en el desempeño de los árboles de decisión en nuestros conjuntos de datos. La presencia de ruido en las variables es una situación común, lo que suscita la importancia y el interés en comprender a fondo cómo los árboles reaccionan en estos escenarios.
 
