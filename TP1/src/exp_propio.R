@@ -112,9 +112,9 @@ datasets_to_pred <- list(
   load_df("./data/customer_churn.csv", "Churn", "churn"), 
   load_df("./data/heart.csv", "Heart", "HeartDisease"),
   load_df("./data/winequality_modificados.csv", "Wine", "quality"),
-  load_df("./data/customer_churn_top.csv", "Churn_top", "churn"),
-  load_df("./data/heart_top.csv", "Heart_top", "HeartDisease"),
-  load_df("./data/winequality_top.csv", "Wine_top", "quality")
+  load_df("./data/customer_churn_top.csv", "Churn_new", "churn"),
+  load_df("./data/heart_top.csv", "Heart_new", "HeartDisease"),
+  load_df("./data/winequality_top.csv", "Wine_new", "quality")
 )
 
 # Run the experiment

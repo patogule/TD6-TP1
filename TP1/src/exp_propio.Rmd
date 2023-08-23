@@ -1,13 +1,14 @@
 ---
-title: "Experimento Propio"
-author: "Patricio Guledjian, Azul Noguera, Rocio Gonzalez"
-date: "2023-08-17"
-output:
-  pdf_document: default
-  html_document: default
+title: "Experimento propio"
+author: 
+    - "Patricio Guledjuan"
+    - "Azul Noguera"
+    - "Rocio Gonzalez"
+date: "`r Sys.Date()`"
+output: pdf_document
 ---
 
-```{r, echo=FALSE, message=FALSE}
+```{r, message=FALSE}
 source("exp_propio.R")
 ```
 
@@ -118,17 +119,14 @@ scatter_plot_c <- ggplot(variable_importance_datac, aes(x = Variable, y = Import
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
         plot.title = element_text(hjust = 0.5),
-        plot.margin = margin(0, 0,0, 0, "cm"), 
+        plot.margin = margin(0, 0, 1, 0, "cm"), 
         ) +
   annotate("text", x = Inf, y = mean_importance_c, label = "Media",
            hjust = 1.2, vjust = 1.3, color = "darkgrey", size = 4) +
   guides(color = FALSE)  # Quitar la leyenda
 
 # Mostrar el gráfico
-print(scatter_plot_c, out.width = "10%")
-
-
-
+#print(scatter_plot_c, out.width = "10%")
 ```
 
 ```{r, echo=FALSE, warning=FALSE}
@@ -153,14 +151,14 @@ scatter_plot_h <- ggplot(variable_importance_datah, aes(x = Variable, y = Import
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
         plot.title = element_text(hjust = 0.5),
-        plot.margin = margin(0, 0, 0, 0, "cm")
+        plot.margin = margin(0, 0, 1, 0, "cm")
         ) +
   annotate("text", x = Inf, y = mean_importance_h, label = "Media",
            hjust = 1.2, vjust = 1.3, color = "darkgrey", size = 4) +
   guides(color = FALSE)  # Quitar la leyenda
 
 # Mostrar el gráfico
-print(scatter_plot_h, out.width = "10%")
+#print(scatter_plot_h, out.width = "10%")
 ```
 
 ```{r, echo=FALSE, warning=FALSE}
@@ -185,14 +183,28 @@ scatter_plot_w <- ggplot(variable_importance_dataw, aes(x = Variable, y = Import
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
         plot.title = element_text(hjust = 0.5),
-        plot.margin = margin(0, 0, 0, 0, "cm")
+        plot.margin = margin(0, 0, 1, 0, "cm")
         ) +
   annotate("text", x = Inf, y = mean_importance_w, label = "Media",
            hjust = 1.2, vjust = 1.3, color = "darkgrey", size = 4) +
   guides(color = FALSE)  # Quitar la leyenda
 
 # Mostrar el gráfico
-print(scatter_plot_w, out.width = "10%")
+#print(scatter_plot_w, out.width = "10%")
+```
+
+```{r, echo=FALSE}
+# Guardar el primer gráfico con altura específica
+ggsave("./outputs/plots/scatter_plot_c.png", plot = scatter_plot_c, width = 8, height = 3.5)
+
+# Guardar el segundo gráfico con altura específica
+ggsave("./outputs/plots/scatter_plot_h.png", plot = scatter_plot_h, width = 8, height = 3.5)
+
+# Guardar el tercer gráfico con altura específica
+ggsave("./outputs/plots/scatter_plot_w.png", plot = scatter_plot_w, width = 8, height = 3.5)
+
+knitr::include_graphics(c("./outputs/plots/scatter_plot_c.png", "./outputs/plots/scatter_plot_h.png", "./outputs/plots/scatter_plot_w.png"))
+
 ```
 
 
@@ -251,7 +263,7 @@ kable(nuevos, caption = "Variables incluidas en los nuevos datasets", col.names 
 ## Resultados
 
 ![Resultados](./outputs/plots/exp_propio.jpg)
-Llevamos a cabo este experimento con la finalidad de indagar si incrementar el número de variables predictoras inevitablemente resulta en una mejora en el rendimiento del modelo, o si este resultado está condicionado por la importancia intrínseca de cada variable y las características particulares de los conjuntos de datos. Para efectuar este análisis, evaluamos el desempeño de los tres conjuntos de datos originales, junto con el de tres conjuntos de datos que fueron reducidos únicamente a las variables más significativas.
+Llevamos a cabo este experimento con la finalidad de indagar si incrementar el número de variables predictoras inevitablemente resulta en una mejora en el rendimiento del modelo, o si este resultado está condicionado por la importancia intrínseca de cada variable y las características particulares de los conjuntos de datos. Para efectuar este análisis, evaluamos el desempeño de los tres conjuntos de datos originales (Churn, Heart, Wine), junto con el de tres conjuntos de datos que fueron reducidos únicamente a las variables más significativas (Churn_new, Heart_new, Wine_new).
 
 A grandes rasgos, podemos observar que las diferencias de rendimiento entre los conjuntos de datos originales y los conjuntos de datos reducidos son en su mayoría mínimas, siendo las performances prácticamente idénticas. Si profundizamos en los detalles, a medida que aumentamos la profundidad del árbol, se observa una ligera tendencia en la cual los conjuntos de datos originales tienen un rendimiento ligeramente superior en comparación con los conjuntos de datos reducidos.
 
@@ -370,3 +382,15 @@ plot_correlation_heatmap(cor_wine, "Correlation Heatmap - Wine Dataset")
 En este caso, no se observan correlaciones particularmente altas o evidentes entre las variables eliminadas y las que se mantuvieron. Por ejemplo, las variables "fixed.acidity," "chlorides," y "pH" presentan correlaciones con las variables restantes que son bastante bajas, lo que sugiere que no hay una fuerte relación lineal entre estas variables.
 
 Dado que las correlaciones no muestran una conexión clara entre las variables eliminadas y las variables que se mantuvieron en el modelo, es posible que las variables eliminadas no hayan sido excluidas debido a una correlación directa con las variables restantes. En cambio, otras consideraciones, como redundancia de información, relevancia contextual o impacto en la capacidad predictiva, parecen haber influido en su eliminación.
+
+
+## Conclusión
+
+En resumen, nuestros análisis detallados en los tres conjuntos de datos distintos llegan a una conclusión consistente. La eliminación de variables cuya importancia se encuentra por debajo de la media no parece tener un impacto sustancial en la capacidad predictiva de los modelos. Nuestras observaciones revelan que el rendimiento de los modelos es prácticamente idéntico entre los conjuntos de datos originales y aquellos que han sido reducidos.
+
+La aparente falta de efecto de la eliminación de variables puede ser atribuida a la cantidad limitada de información que estas variables proporcionaban en sus respectivos contextos. Estas variables parecen haber tenido un impacto menor en la capacidad general del modelo para realizar predicciones precisas.
+
+Además, nuestra exploración de las correlaciones entre las variables eliminadas y las que se mantuvieron refuerza nuestra conclusión. Ninguna de las variables eliminadas mostró una correlación significativa con aquellas que permanecieron en el modelo. Esto sugiere que la falta de cambio en el rendimiento no se debe a la existencia de duplicación de información entre variables.
+
+En última instancia, nuestros análisis respaldan la idea de que la selección de variables basada en su importancia puede ser una estrategia efectiva para simplificar y optimizar modelos sin perjudicar su capacidad de predicción. Sin embargo, es importante recordar que cada conjunto de datos y problema específico puede tener consideraciones únicas, por lo que es recomendable realizar evaluaciones exhaustivas en cada caso antes de tomar decisiones finales sobre la eliminación de variables.
+
