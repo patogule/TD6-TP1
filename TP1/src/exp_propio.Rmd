@@ -17,13 +17,17 @@ library(rpart)
 
 ## Introducción
 
-El objetivo de nuestro experimento consistió en explorar y comprender el impacto de las variables en el rendimiento del modelo. A través del análisis de las variables más influyentes, buscamos obtener una visión más profunda de cómo se toman decisiones en el contexto de cada conjunto de datos. Además, evaluamos si la selección de características relevantes podría potencialmente mejorar el desempeño del modelo.
+El objetivo de nuestro experimento reside en indagar y comprender la repercusión de las variables sobre la eficacia del modelo. A través del análisis de las variables más influyentes, buscamos adentrarnos en una comprensión más profunda de cómo se toman decisiones en el contexto de cada conjunto de datos. Asimismo, examinaremos si la selección de características relevantes podría potencialmente enriquecer el desempeño del modelo.
 
-Nuestro enfoque implicó identificar las variables más significativas en función del comportamiento del modelo original y, posteriormente, elegir las variables más influyentes para construir un nuevo modelo. Esta estrategia nos permitió comparar el rendimiento del nuevo modelo con el del original y analizar cualquier diferencia resultante.
 
-En una primera etapa, evaluamos la importancia de los atributos en el modelo original utilizando rpart. En este contexto, una alta puntuación de importancia sugiere que la variable ejerce una mayor influencia en las decisiones tomadas por el árbol, y por ende, en las predicciones resultantes.
+Nuestra metodología se enfocará en la identificación de las variables más significativas basándonos en el comportamiento del modelo original y, posteriormente, seleccionando aquellas que más influyen para construir un nuevo modelo. Esta estrategia nos brindará la oportunidad de contrastar el rendimiento del nuevo modelo con el del original y analizar cualquier disparidad resultante.
+
+## Metodología
+
+En una fase inicial, evaluaremos la relevancia de los atributos en el modelo original mediante el uso de rpart. En este contexto, un puntaje elevado de importancia sugiere que la variable ejerce una influencia más considerable en las decisiones tomadas por el árbol, y por ende, en las predicciones resultantes.
 
 ```{r, echo=FALSE}
+library(knitr)
 
 #Buscamos las variables mas importantes de el dataset Churn
 datos_churn <- read.csv("./data/customer_churn.csv")
@@ -35,7 +39,8 @@ variable_importance_churn <- tree_churn$variable.importance
 
 mean_variable_importance_churn <- mean(variable_importance_churn)
 
-data.frame(Churn_Importance = variable_importance_churn)
+kable(variable_importance_churn, caption = "Nivel de importancia de variables del dataset **Churn**", col.names = "**Importancia de Variables**", align = "c", booktabs = TRUE, longtable = FALSE )
+
 ```
 
 ```{r, echo=FALSE}
@@ -50,7 +55,7 @@ variable_importance_heart <- tree_heart$variable.importance
 
 mean_variable_importance_heart <- mean(variable_importance_heart)
 
-data.frame(Heart_Importance = variable_importance_heart)
+kable(variable_importance_heart, caption = "Nivel de importancia de variables del dataset **Heart**", col.names = "**Importancia de Variables**", align = "c", booktabs = TRUE, longtable = FALSE )
 ```
 
 ```{r, echo=FALSE}
@@ -65,19 +70,34 @@ variable_importance_wine <- tree_wine$variable.importance
 
 mean_variable_importance_wine <- mean(variable_importance_wine)
 
-data.frame(Wine_Importance = variable_importance_wine)
+kable(variable_importance_wine, caption = "Nivel de importancia de variables del dataset **Wine**", col.names = "**Importancia de Variables**", align = "c", booktabs = TRUE, longtable = FALSE )
 ```
 A partir de estos valores de importancia, establecimos una estrategia para determinar qué variables serían incluidas en el nuevo conjunto de datos. Para ello, calculamos el valor promedio de importancia de todas las variables presentes en el conjunto de datos original. Posteriormente, seleccionamos aquellas variables cuya importancia superara este promedio. Como resultado, cada uno de los conjuntos de datos originales se redujo a un conjunto de seis variables predictoras de mayor relevancia.
 
 ```{r, echo=FALSE}
-#Tabla con importancia promedio por dataset 
-data.frame(Dataset = c("ChurnRate", "HeartDisease", "WineQuality"), 
-           Importancia_Promedio = c(mean_variable_importance_churn, mean_variable_importance_heart, mean_variable_importance_wine)
-           )
-```
 
-```{r, echo=FALSE}
-#Graficamos la importancia de cada variable y el promedio
+# Crear un data frame con los nombres de los datasets y sus respectivas importancias promedio
+dataset_names <- c("ChurnRate", "HeartDisease", "WineQuality")
+importancias <- c(mean_variable_importance_churn, mean_variable_importance_heart, mean_variable_importance_wine)
+
+# Crear un data frame combinando los nombres de los datasets y las importancias
+tabla_completa <- data.frame(Dataset = dataset_names, Importancia_Promedio = importancias)
+
+# Mostrar la tabla con kable
+kable(tabla_completa, caption = "Nivel de importancia promedio de variables por dataset",
+      col.names = c("**Dataset**", "**Importancia promedio**"),
+      align = "c",
+      booktabs = TRUE,
+      longtable = FALSE)
+
+```
+## Variables Importantes
+
+Los gráficos subsiguientes ilustran las variables que exceden el valor medio, resaltadas en tono verde, y las variables que se sitúan por debajo del mismo, identificadas en color rojo. Estas representaciones visuales han sido creadas con la finalidad de discernir las variables que serán consideradas para su inclusión en los nuevos conjuntos de datos.
+
+```{r, echo=FALSE, warning=FALSE}
+
+# Graficamos la importancia de cada variable y el promedio
 library(ggplot2)
 
 # Crear un data frame con las variables y sus importancias
@@ -87,21 +107,31 @@ variable_importance_datac <- data.frame(
 )
 
 # Calcular la media de las importancias
-mean_importance <- mean(variable_importance_datac$Importance)
+mean_importance_c <- mean(variable_importance_datac$Importance)
 
-# Crear el scatter plot con la línea de media
+# Crear el scatter plot con la línea de media y puntos verdes/arriba de la media
 scatter_plot_c <- ggplot(variable_importance_datac, aes(x = Variable, y = Importance)) +
-  geom_point() +
-  geom_hline(yintercept = mean_importance, color = "red", size = 0.5) +
+  geom_point(aes(color = ifelse(Importance >= mean_importance_c, "above", "below")), size = 2) +
+  geom_hline(yintercept = mean_importance_c, color = "darkgrey", size = 0.5) +
   labs(x = "Variable", y = "Importance", title = "Churn Variable Importance Scatter Plot") +
+  scale_color_manual(values = c(above = "lightgreen", below = "red")) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
         plot.title = element_text(hjust = 0.5),
-        plot.margin = margin(1, 1, 1, 1, "cm")
-        ) 
+        plot.margin = margin(0, 0,0, 0, "cm"), 
+        ) +
+  annotate("text", x = Inf, y = mean_importance_c, label = "Media",
+           hjust = 1.2, vjust = 1.3, color = "darkgrey", size = 4) +
+  guides(color = FALSE)  # Quitar la leyenda
+
+# Mostrar el gráfico
+print(scatter_plot_c, out.width = "10%")
+
+
+
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, warning=FALSE}
 #Graficamos la importancia de cada variable y el promedio
 library(ggplot2)
 
@@ -112,20 +142,28 @@ variable_importance_datah <- data.frame(
 )
 
 # Calcular la media de las importancias
-mean_importance <- mean(variable_importance_datah$Importance)
+mean_importance_h <- mean(variable_importance_datah$Importance)
 
-# Crear el scatter plot con la línea de media
+# Crear el scatter plot con la línea de media y puntos verdes/arriba de la media
 scatter_plot_h <- ggplot(variable_importance_datah, aes(x = Variable, y = Importance)) +
-  geom_point() +
-  geom_hline(yintercept = mean_importance, color = "red", size = 0.5) +
+  geom_point(aes(color = ifelse(Importance >= mean_importance_h, "above", "below")), size = 2) +
+  geom_hline(yintercept = mean_importance_h, color = "darkgrey", size = 0.5) +
   labs(x = "Variable", y = "Importance", title = "Heart Variable Importance Scatter Plot") +
+  scale_color_manual(values = c(above = "lightgreen", below = "red")) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
         plot.title = element_text(hjust = 0.5),
-        plot.margin = margin(1, 1, 1, 1, "cm")) 
+        plot.margin = margin(0, 0, 0, 0, "cm")
+        ) +
+  annotate("text", x = Inf, y = mean_importance_h, label = "Media",
+           hjust = 1.2, vjust = 1.3, color = "darkgrey", size = 4) +
+  guides(color = FALSE)  # Quitar la leyenda
+
+# Mostrar el gráfico
+print(scatter_plot_h, out.width = "10%")
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, warning=FALSE}
 #Graficamos la importancia de cada variable y el promedio
 library(ggplot2)
 
@@ -136,36 +174,28 @@ variable_importance_dataw <- data.frame(
 )
 
 # Calcular la media de las importancias
-mean_importance <- mean(variable_importance_dataw$Importance)
+mean_importance_w <- mean(variable_importance_dataw$Importance)
 
-# Crear el scatter plot con la línea de media
+# Crear el scatter plot con la línea de media y puntos verdes/arriba de la media
 scatter_plot_w <- ggplot(variable_importance_dataw, aes(x = Variable, y = Importance)) +
-  geom_point() +
-  geom_hline(yintercept = mean_importance, color = "red", size = 0.5) +
+  geom_point(aes(color = ifelse(Importance >= mean_importance_w, "above", "below")), size = 2) +
+  geom_hline(yintercept = mean_importance_w, color = "darkgrey", size = 0.5) +
   labs(x = "Variable", y = "Importance", title = "Wine Variable Importance Scatter Plot") +
+  scale_color_manual(values = c(above = "lightgreen", below = "red")) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
         plot.title = element_text(hjust = 0.5),
-        plot.margin = margin(1, 1, 1, 1, "cm")) 
+        plot.margin = margin(0, 0, 0, 0, "cm")
+        ) +
+  annotate("text", x = Inf, y = mean_importance_w, label = "Media",
+           hjust = 1.2, vjust = 1.3, color = "darkgrey", size = 4) +
+  guides(color = FALSE)  # Quitar la leyenda
+
+# Mostrar el gráfico
+print(scatter_plot_w, out.width = "10%")
 ```
 
-### Variables importantes del dataset Churn
 
-```{r, echo=FALSE}
-scatter_plot_c
-```
-
-### Variables importantes del dataset Heart
-
-```{r, echo=FALSE}
-scatter_plot_h
-```
-
-### Variables importantes del dataset Wine
-
-```{r, echo=FALSE}
-scatter_plot_w
-```
 
 ```{r, echo=FALSE}
 #Decidimos cuantas variables dejar en cada nuevo dataset. Para eso, nos quedamos con todas las variables que superen en importancia al promedio.
@@ -176,9 +206,6 @@ top_variables_wine <- names(variable_importance_wine[variable_importance_wine > 
 
 ```
 
-A partir de esto, obtuvimos los nuevos datasets que contienen las variables que cumplían con la condición planteada anteriormente. 
-
-### Variables en datasets reducidos
 ```{r, echo=FALSE}
 # Creamos un nuevo conjunto de datos de entrenamiento con las variables más importantes y la variable objetivo
 customer_churn_top <- datos_churn[, c(top_variables_churn, "churn")]
@@ -204,15 +231,21 @@ write.csv(heart_top, file=ruta_archivo_nuevo, sep = ',', row.names=FALSE)
 })
 ```
 
-```{r, echo=FALSE}
-#Tabla que muestra las variables incluidas en los nuevos datasets
 
-data.frame(
+### Variables de Datasets Reducidos
+
+A raíz de lo expuesto anteriormente, hemos generado nuevos conjuntos de datos que incorporan únicamente aquellas variables que satisfacen las condiciones establecidas previamente.
+
+```{r, echo=FALSE}
+#
+
+nuevos = data.frame(
           Churn_variables = top_variables_churn,
           Heart_variables = top_variables_heart,
           Wine_variables = top_variables_wine
           )
 
+kable(nuevos, caption = "Variables incluidas en los nuevos datasets", col.names = c("**Churn**", "**Heart**", "**Wine**"), align = "c", booktabs = TRUE, longtable = FALSE )
 ```
 
 ## Resultados
